@@ -223,7 +223,9 @@ def stop_following(follow_id):
 def profile():
     """Update profile for current user."""
 
-    # IMPLEMENT THIS
+    user = User.query.all()
+
+    return render_template("/users/detail.html", user=user)
 
 
 @app.route("/users/delete", methods=["POST"])
