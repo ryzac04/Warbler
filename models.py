@@ -4,6 +4,7 @@ from datetime import datetime
 
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Text
 
 bcrypt = Bcrypt()
 db = SQLAlchemy()
@@ -12,17 +13,17 @@ db = SQLAlchemy()
 class Follows(db.Model):
     """Connection of a follower <-> followed_user."""
 
-    __tablename__ = 'follows'
+    __tablename__ = "follows"
 
     user_being_followed_id = db.Column(
         db.Integer,
-        db.ForeignKey('users.id', ondelete="cascade"),
+        db.ForeignKey("users.id", ondelete="cascade"),
         primary_key=True,
     )
 
     user_following_id = db.Column(
         db.Integer,
-        db.ForeignKey('users.id', ondelete="cascade"),
+        db.ForeignKey("users.id", ondelete="cascade"),
         primary_key=True,
     )
 
@@ -30,29 +31,21 @@ class Follows(db.Model):
 class Likes(db.Model):
     """Mapping user likes to warbles."""
 
-    __tablename__ = 'likes' 
+    __tablename__ = "likes"
 
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
+    id = db.Column(db.Integer, primary_key=True)
 
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey('users.id', ondelete='cascade')
-    )
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="cascade"))
 
     message_id = db.Column(
-        db.Integer,
-        db.ForeignKey('messages.id', ondelete='cascade'),
-        unique=True
+        db.Integer, db.ForeignKey("messages.id", ondelete="cascade"), unique=True
     )
 
 
 class User(db.Model):
     """User in the system."""
 
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = db.Column(
         db.Integer,
@@ -76,10 +69,7 @@ class User(db.Model):
         default="/static/images/default-pic.png",
     )
 
-    header_image_url = db.Column(
-        db.Text,
-        default="/static/images/warbler-hero.jpg"
-    )
+    header_image_url = db.Column(db.Text, default="/static/images/warbler-hero.jpg")
 
     bio = db.Column(
         db.Text,
@@ -94,26 +84,23 @@ class User(db.Model):
         nullable=False,
     )
 
-    messages = db.relationship('Message')
+    messages = db.relationship("Message")
 
     followers = db.relationship(
         "User",
         secondary="follows",
         primaryjoin=(Follows.user_being_followed_id == id),
-        secondaryjoin=(Follows.user_following_id == id)
+        secondaryjoin=(Follows.user_following_id == id),
     )
 
     following = db.relationship(
         "User",
         secondary="follows",
         primaryjoin=(Follows.user_following_id == id),
-        secondaryjoin=(Follows.user_being_followed_id == id)
+        secondaryjoin=(Follows.user_being_followed_id == id),
     )
 
-    likes = db.relationship(
-        'Message',
-        secondary="likes"
-    )
+    likes = db.relationship("Message", secondary="likes")
 
     def __repr__(self):
         return f"<User #{self.id}: {self.username}, {self.email}>"
@@ -137,7 +124,7 @@ class User(db.Model):
         Hashes password and adds user to system.
         """
 
-        hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
+        hashed_pwd = bcrypt.generate_password_hash(password).decode("UTF-8")
 
         user = User(
             username=username,
@@ -173,7 +160,7 @@ class User(db.Model):
 class Message(db.Model):
     """An individual message ("warble")."""
 
-    __tablename__ = 'messages'
+    __tablename__ = "messages"
 
     id = db.Column(
         db.Integer,
@@ -193,11 +180,11 @@ class Message(db.Model):
 
     user_id = db.Column(
         db.Integer,
-        db.ForeignKey('users.id', ondelete='CASCADE'),
+        db.ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
     )
 
-    user = db.relationship('User')
+    user = db.relationship("User")
 
 
 def connect_db(app):
@@ -205,6 +192,6 @@ def connect_db(app):
 
     You should call this in your Flask app.
     """
-
+    app.app_context().push()
     db.app = app
     db.init_app(app)
