@@ -26,7 +26,7 @@ class LoginForm(FlaskForm):
 
 
 class EditForm(FlaskForm):
-    """Form for editting user information."""
+    """Form for editing user information."""
 
     username = StringField("Username")
     email = StringField("E-mail")
